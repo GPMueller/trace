@@ -54,3 +54,44 @@ target_compile_options( ${LIBRARY_NAME} PRIVATE
                         $<$<CXX_COMPILER_ID:MSVC>:
                             /WX /W4 >)
 ###########################################################
+
+
+######### Tests ###########################################
+enable_testing( )
+
+set( TEST_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR} )
+
+set( TEST_SOURCES
+    tests/main.cpp
+    tests/should_throw.cpp )
+
+# Executable
+add_executable( test_trace ${TEST_SOURCES} )
+target_link_libraries( test_trace ${LIBRARY_NAME} )
+
+# Properties
+set_target_properties( test_trace PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${TEST_RUNTIME_OUTPUT_DIRECTORY}
+    CXX_STANDARD            17
+    CXX_STANDARD_REQUIRED   ON
+    CXX_EXTENSIONS          OFF
+    COMPILE_FLAGS           "${TRACE_COMPILE_FLAGS} ${TRACE_FLAGS_COVERAGE}"
+    LINK_FLAGS              "${TRACE_LINK_FLAGS}    ${TRACE_FLAGS_COVERAGE}" )
+
+# Add the test
+add_test( NAME              test_trace
+          WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+          COMMAND           test_trace --use-colour=yes )
+###########################################################
+
+
+######### Examples ########################################
+# add_executable( ${EXECUTABLE_NAME} main.cpp )
+
+# set_target_properties( ${EXECUTABLE_NAME} PROPERTIES
+#     CXX_STANDARD          11
+#     CXX_STANDARD_REQUIRED ON
+#     CXX_EXTENSIONS        OFF )
+
+# target_link_libraries( ${EXECUTABLE_NAME} PUBLIC trace)
+###########################################################
