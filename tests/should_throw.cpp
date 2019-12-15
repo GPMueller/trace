@@ -2,15 +2,15 @@
 
 #include <trace/trace.hpp>
 
-void library_function()
+void should_throw()
 {
     trace::initiate( "throwing for test" );
 }
 
-TEST_CASE( "State", "[state]" )
+TEST_CASE( "Should throwing", "[throw]" )
 {
-    SECTION( "State setup" )
+    SECTION( "throw" )
     {
-        REQUIRE_THROWS( library_function() );
+        REQUIRE_THROWS( should_throw() );
     }
 }

@@ -63,6 +63,7 @@ set( TEST_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR} )
 
 set( TEST_SOURCES
     tests/main.cpp
+    tests/should_not_throw.cpp
     tests/should_throw.cpp )
 
 # Executable
