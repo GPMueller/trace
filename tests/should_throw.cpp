@@ -4,7 +4,7 @@
 
 void library_function()
 {
-    trace_throw( "throwing for test" );
+    trace::initiate( "throwing for test" );
 }
 
 TEST_CASE( "State", "[state]" )

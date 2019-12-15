@@ -1,11 +1,31 @@
 #pragma once
 
+#include <mutex>
 #include <stdexcept>
 #include <string>
 
 namespace trace
 {
-    extern std::string global_latest_message;
+    // Retrieve the latest (error) message
+    std::string latest();
+}
+
+namespace trace::inner
+{
+    extern std::string _latest_trace_string;
+    extern std::mutex _trace_string_mutex;
+
+    // Throw a trace::inner::exception
+    void
+    throw_exception( const std::string & message, const char * file, unsigned int line );
+
+    // Rethrow (creates a std::nested_exception) an exception, using the Exception class
+    // which contains file and line info. The original exception is preserved...
+    void rethrow_exception(
+        const std::string & message, const char * file, unsigned int line );
+
+    // General exception handler
+    void handle_exception( const std::exception & ex, const std::string & function = "" );
 
     // Custom exception class to be used for more practical throwing
     class exception : public std::runtime_error
@@ -28,20 +48,4 @@ namespace trace
       private:
         std::string _message;
     };
-
-    // Rethrow (creates a std::nested_exception) an exception, using the Exception class
-    // which contains file and line info. The original exception is preserved...
-    void rethrow( const std::string & message, const char * file, unsigned int line );
-
-    // General Exception handler
-    void handle_exception( const std::exception & ex, const std::string & function = "" );
 }
-
-// Shorthand for throwing an Exception with file and line info using macros
-#define trace_throw( message ) throw trace::exception( message, __FILE__, __LINE__ );
-
-// Shorthand for rethrowing and Exception with file and line info using macros
-#define trace_rethrow( message ) trace::rethrow( message, __FILE__, __LINE__ );
-
-// Shorthand for handling an exception, including a backtrace
-#define trace_handle_exception( ex ) trace::handle_exception( ex, __func__ );
