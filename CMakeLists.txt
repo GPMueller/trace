@@ -18,6 +18,13 @@ set( LIBRARY_NAME trace )
 ######### Prevent messing up the source tree ##############
 set( CMAKE_DISABLE_SOURCE_CHANGES  ON )
 set( CMAKE_DISABLE_IN_SOURCE_BUILD ON )
+### Output paths for multi-config builds (e.g. MSVC)
+foreach( OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES} )
+    string( TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG )
+    set( CMAKE_RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${PROJECT_BINARY_DIR} )
+    set( CMAKE_LIBRARY_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${PROJECT_BINARY_DIR} )
+    set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${PROJECT_BINARY_DIR} )
+endforeach( )
 ###########################################################
 
 
