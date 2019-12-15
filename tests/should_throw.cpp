@@ -4,13 +4,13 @@
 
 void library_function()
 {
-    trace_throw("throwing for test");
+    trace_throw( "throwing for test" );
 }
 
-TEST_CASE("State", "[state]")
+TEST_CASE( "State", "[state]" )
 {
-    SECTION("State setup")
+    SECTION( "State setup" )
     {
-        REQUIRE_THROWS(library_function());
+        REQUIRE_THROWS( library_function() );
     }
 }
