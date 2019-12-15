@@ -1,0 +1,37 @@
+---
+### General config, applies to all languages ###
+BasedOnStyle: LLVM
+AlignAfterOpenBracket:                AlwaysBreak
+AlignConsecutiveAssignments:          true
+AllowShortCaseLabelsOnASingleLine:    true
+AllowShortFunctionsOnASingleLine:     Empty
+AllowShortIfStatementsOnASingleLine:  true
+BreakBeforeTernaryOperators:          false
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+ConstructorInitializerIndentWidth:    8
+ContinuationIndentWidth:              4
+BreakBeforeBraces:    Allman
+ColumnLimit:          90
+FixNamespaceComments: false
+IncludeCategories:
+  - Regex:            '".*"'
+    Priority:         1
+  - Regex:            '^<.*\.h>'
+    Priority:         2
+  - Regex:            '^<.*'
+    Priority:         3
+IndentCaseLabels:     true
+IndentWidth:          4
+PenaltyBreakComment:  10000000
+PointerAlignment:     Middle
+TabWidth:             4
+UseTab:               Never
+---
+### C++ specific config ###
+Language:             Cpp
+Standard:             Cpp11
+Cpp11BracedListStyle: false
+NamespaceIndentation: All
+CompactNamespaces:    true
+SpacesInAngles:       false
+SpaceAfterTemplateKeyword:        false
