@@ -54,11 +54,11 @@ endif()
 ######### trace library ###################################
 set( TRACE_HEADER_FILES
     include/trace/trace.hpp
-    include/trace/exception.hpp
+    include/trace/trace_exception.hpp
 )
 
 set( TRACE_SOURCE_FILES
-    src/exception.cpp
+    src/trace_exception.cpp
 )
 
 add_library( ${LIBRARY_NAME} ${TRACE_SOURCE_FILES} )

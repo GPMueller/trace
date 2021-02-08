@@ -1,4 +1,4 @@
-#include "exception.hpp"
+#include "trace_exception.hpp"
 
 // Initiation point for a backtrace
 // This is as deep as the trace will go
