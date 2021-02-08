@@ -36,3 +36,44 @@ jobs:
       shell: bash
       working-directory: ${{runner.workspace}}/build
       run: ./test_trace
+
+  coverage:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: 📚 Install necessary packages
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install numpy coverage 'coveralls<3' wheel
+        sudo apt update
+        sudo apt install lcov
+
+    - name: 📁 Create build folder
+      run: cmake -E make_directory ${{runner.workspace}}/build
+
+    - name: ⚙ Configure
+      shell: bash
+      working-directory: ${{runner.workspace}}/build
+      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=Debug -DTRACE_TEST_COVERAGE=ON
+
+    - name: 🛠 Build
+      shell: bash
+      working-directory: ${{runner.workspace}}/build
+      run: |
+        cmake --build . --config Debug -j 2
+
+    - name: 🧪 Coverage test
+      shell: bash
+      working-directory: ${{runner.workspace}}/build
+      run: |
+        lcov -c -i --no-external --directory . --base-directory $GITHUB_WORKSPACE -o baseline.info
+        ./test_trace
+        lcov -c --no-external --directory . --base-directory $GITHUB_WORKSPACE -o after_test.info
+        lcov -a baseline.info -a after_test.info -o total_test.info
+        lcov -r total_test.info \*/tests/\* -o coverage.info
+    - name: upload C++ coverage
+      uses: codecov/codecov-action@v1
+      with:
+        files: ${{runner.workspace}}/build/coverage.info
