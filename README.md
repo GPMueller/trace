@@ -1,7 +1,7 @@
 trace - portable exception backtracing in C++17
 ====================================================================
 
-[![Build Status](https://api.travis-ci.com/GPMueller/trace.svg?branch=master)](https://travis-ci.com/github/GPMueller/trace)
+[![CI](https://github.com/GPMueller/trace/workflows/CI/badge.svg)](https://github.com/GPMueller/trace/actions)
 
 This library uses
 [`std::nested_exception`](http://en.cppreference.com/w/cpp/error/nested_exception)
