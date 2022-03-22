@@ -2,6 +2,14 @@ name: CI
 
 on: [push, pull_request]
 
+defaults:
+  run:
+    shell: bash
+
+# Single quotes around ${{runner.workspace}} prevent bash from treating the '\'
+# path separators as escapes. This is required for a job that is run on windows
+# with bash shell.
+
 jobs:
 
   test:
@@ -16,64 +24,66 @@ jobs:
       BUILD_TYPE: ${{ matrix.build-type }}
 
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: 📁 Create build folder
-      run: cmake -E make_directory ${{runner.workspace}}/build
+      - name: 📚 Install necessary packages
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt update
+          sudo apt install -y cmake
 
-    - name: ⚙ Configure
-      shell: bash
-      working-directory: ${{runner.workspace}}/build
-      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+      - name: 📁 Create build folder
+        run: |
+          cmake -E make_directory '${{runner.workspace}}/build'
 
-    - name: 🛠 Build
-      shell: bash
-      working-directory: ${{runner.workspace}}/build
-      run: |
-        cmake --build . --config $BUILD_TYPE -j 2
+      - name: ⚙ Configure
+        working-directory: '${{runner.workspace}}/build'
+        run: |
+          cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DTRACE_BUILD_TESTING=ON
 
-    - name: 🧪 Test
-      shell: bash
-      working-directory: ${{runner.workspace}}/build
-      run: ./test_trace
+      - name: 🛠 Build
+        working-directory: '${{runner.workspace}}/build'
+        run: |
+          cmake --build . --config $BUILD_TYPE -j 2
+
+      - name: 🧪 Test
+        working-directory: '${{runner.workspace}}/build'
+        run: ./test_trace
 
   coverage:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: 📚 Install necessary packages
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install numpy coverage 'coveralls<3' wheel
-        sudo apt update
-        sudo apt install lcov
+      - name: 📚 Install necessary packages
+        run: |
+          sudo apt update
+          sudo apt install -y cmake python3-pip lcov
+          python -m pip install --upgrade pip
+          python -m pip install numpy coverage 'coveralls<3' wheel
 
-    - name: 📁 Create build folder
-      run: cmake -E make_directory ${{runner.workspace}}/build
+      - name: 📁 Create build folder
+        run: cmake -E make_directory ${{runner.workspace}}/build
 
-    - name: ⚙ Configure
-      shell: bash
-      working-directory: ${{runner.workspace}}/build
-      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=Debug -DTRACE_TEST_COVERAGE=ON
+      - name: ⚙ Configure
+        working-directory: ${{runner.workspace}}/build
+        run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=Debug -DTRACE_BUILD_TESTING=ON -DTRACE_TEST_COVERAGE=ON
 
-    - name: 🛠 Build
-      shell: bash
-      working-directory: ${{runner.workspace}}/build
-      run: |
-        cmake --build . --config Debug -j 2
+      - name: 🛠 Build
+        working-directory: ${{runner.workspace}}/build
+        run: |
+          cmake --build . --config Debug -j 2
 
-    - name: 🧪 Coverage test
-      shell: bash
-      working-directory: ${{runner.workspace}}/build
-      run: |
-        lcov -c -i --no-external --directory . --base-directory $GITHUB_WORKSPACE -o baseline.info
-        ./test_trace
-        lcov -c --no-external --directory . --base-directory $GITHUB_WORKSPACE -o after_test.info
-        lcov -a baseline.info -a after_test.info -o total_test.info
-        lcov -r total_test.info \*/tests/\* -o coverage.info
-    - name: upload C++ coverage
-      uses: codecov/codecov-action@v1
-      with:
-        files: ${{runner.workspace}}/build/coverage.info
+      - name: 🧪 Coverage test
+        working-directory: ${{runner.workspace}}/build
+        run: |
+          lcov -c -i --no-external --directory . --base-directory $GITHUB_WORKSPACE -o baseline.info
+          ./test_trace
+          lcov -c --no-external --directory . --base-directory $GITHUB_WORKSPACE -o after_test.info
+          lcov -a baseline.info -a after_test.info -o total_test.info
+          lcov -r total_test.info \*/tests/\* -o coverage.info
+      - name: upload C++ coverage
+        uses: codecov/codecov-action@v1
+        with:
+          files: ${{runner.workspace}}/build/coverage.info

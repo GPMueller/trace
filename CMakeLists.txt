@@ -4,6 +4,7 @@ cmake_minimum_required(VERSION 3.10)
 
 
 ######### Options #########################################
+option( TRACE_BUILD_TESTING "Build trace tests"                     OFF )
 option( TRACE_TEST_COVERAGE "Build trace tests with coverage flags" OFF )
 ###########################################################
 
@@ -101,7 +102,7 @@ install( EXPORT      ${PROJECT_NAME}Targets
 file( WRITE "${CMAKE_CURRENT_BINARY_DIR}/Config.cmake.in" [[
 @PACKAGE_INIT@
 
-include ( "${CMAKE_CURRENT_LIST_DIR}/TraceTargets.cmake" )
+include( "${CMAKE_CURRENT_LIST_DIR}/TraceTargets.cmake" )
 ]] )
 
 include( CMakePackageConfigHelpers )
@@ -113,7 +114,7 @@ configure_package_config_file(
     NO_SET_AND_CHECK_MACRO
     NO_CHECK_REQUIRED_COMPONENTS_MACRO )
 
-write_basic_package_version_file (
+write_basic_package_version_file(
   "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
   VERSION       "${${PROJECT_NAME}_VERSION}"
   COMPATIBILITY AnyNewerVersion
@@ -129,11 +130,8 @@ export( EXPORT ${PROJECT_NAME}Targets
 
 
 ######### Tests ###########################################
-option( BUILD_TESTING ON )
-if ( BUILD_TESTING )
+if( TRACE_BUILD_TESTING )
     enable_testing()
-
-    set( TEST_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR} )
 
     set( TEST_SOURCES
         tests/main.cpp
@@ -146,16 +144,15 @@ if ( BUILD_TESTING )
 
     # Properties
     set_target_properties( test_trace PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY ${TEST_RUNTIME_OUTPUT_DIRECTORY}
-        CXX_STANDARD          17
-        CXX_STANDARD_REQUIRED ON
-        CXX_EXTENSIONS        OFF
-        COMPILE_FLAGS         "${TRACE_COMPILE_FLAGS} ${TRACE_FLAGS_COVERAGE}"
-        LINK_FLAGS            "${TRACE_LINK_FLAGS}    ${TRACE_FLAGS_COVERAGE}" )
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+        CXX_STANDARD             17
+        CXX_STANDARD_REQUIRED    ON
+        CXX_EXTENSIONS           OFF
+        COMPILE_FLAGS            "${TRACE_COMPILE_FLAGS} ${TRACE_FLAGS_COVERAGE}"
+        LINK_FLAGS               "${TRACE_LINK_FLAGS}    ${TRACE_FLAGS_COVERAGE}" )
 
     # Add the test
     add_test( NAME              test_trace
-              WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
               COMMAND           test_trace --use-colour=yes )
 endif()
 ###########################################################
